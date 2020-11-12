@@ -11,6 +11,20 @@ import {
 import { StyledSheet, Platform } from 'react-native'
 import styled from 'styled-components/native';
 import _ from 'lodash';
+import AsyncStorage from '@react-native-async-storage/async-storage'; 
+
+// 예시
+// 비동기 데이터 읽기. 시간간격 약간 발생
+// const list = AsyncStorage.getItem('list')
+
+// // 이벤트 기반 발생: 저장하기
+// AsyncStorage.getItem('test')
+//   .then( data =>{ // 이벤트 활용
+//     alert(data);
+//   })
+//   .catch( error =>{
+//     alert(error.message);
+//   });
 
 const Container = styled.SafeAreaView`
   flex:1;
@@ -52,9 +66,29 @@ export default function App(){
   ]); // useState안에는 기본값
   const [inputTodo, setInputTodo] = React.useState('');
 
+  // 데이터 로드
+  React.useEffect( ()=>{
+    AsyncStorage.getItem('list')
+    .then( data=>{
+      if(data !== null){ 
+        setList(JSON.parse(data));
+      }
+      })
+    .catch(error=>{
+      alert(error.message)
+      });
+  }, [] );
+
+  // 데이터 저장
+  const store = (newList) =>{
+    setList(newList);
+    AsyncStorage.setItem('list', JSON.stringify(newList));
+
+  }
+
   return(
-    // 크게 2가지 리턴 가능
-    // components, 컴포넌트로 이루어진 배열
+    // 크게 두가지 리턴 가능
+    // components, 컴포넌트로 이루어진 배열 리턴 가능
     <Container> 
       <KeyboardAvoidView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>      
       <Contents>
@@ -67,7 +101,7 @@ export default function App(){
           <TodoItemButton 
             title='삭제' 
             onPress={ () => {
-              setList(_.reject(list, elem => elem.id === item.id ));
+              store(_.reject(list, elem => elem.id === item.id ));
             } } 
             />
         </TodoItem>
@@ -90,7 +124,7 @@ export default function App(){
               id: new Date().getTime().toString(), // 유니크한 id 값 필요
               todo: inputTodo,
             };
-            setList( [
+            store( [
               ...list, // 기존 todo
               newItem, // 추가 todo
             ] );
