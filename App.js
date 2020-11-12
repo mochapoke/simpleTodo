@@ -57,6 +57,13 @@ const Input = styled.TextInput`
 `; 
 const Button = styled.Button`
 `;
+const Check = styled.TouchableOpacity`
+  margin-right: 20px;
+`;
+const CheckIcon = styled.Text`
+  font-size: 20px;
+
+`;
 
 
 export default function App(){
@@ -95,6 +102,11 @@ export default function App(){
         {list.map(item=>{
           return(          
         <TodoItem key={item.id}> 
+          <Check>
+            <CheckIcon>
+              {item.done? '💔' : '❤'}
+              </CheckIcon>
+          </Check>
           <TodoItemText> 
             {item.todo}
           </TodoItemText>
@@ -123,6 +135,7 @@ export default function App(){
             const newItem = {
               id: new Date().getTime().toString(), // 유니크한 id 값 필요
               todo: inputTodo,
+              done: false, // 완료 유무
             };
             store( [
               ...list, // 기존 todo
