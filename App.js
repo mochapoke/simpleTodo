@@ -12,19 +12,8 @@ import { StyledSheet, Platform } from 'react-native'
 import styled from 'styled-components/native';
 import _ from 'lodash';
 import AsyncStorage from '@react-native-async-storage/async-storage'; 
+import produce from 'immer'; // 공식문서 참고하기
 
-// 예시
-// 비동기 데이터 읽기. 시간간격 약간 발생
-// const list = AsyncStorage.getItem('list')
-
-// // 이벤트 기반 발생: 저장하기
-// AsyncStorage.getItem('test')
-//   .then( data =>{ // 이벤트 활용
-//     alert(data);
-//   })
-//   .catch( error =>{
-//     alert(error.message);
-//   });
 
 const Container = styled.SafeAreaView`
   flex:1;
@@ -102,9 +91,14 @@ export default function App(){
         {list.map(item=>{
           return(          
         <TodoItem key={item.id}> 
-          <Check>
+          <Check onPress={() => {
+            store( produce(list, draft => {
+              const index = list.indexOf(item);
+              draft[index].done = !list[index].done;
+            }));
+          }}>
             <CheckIcon>
-              {item.done? '💔' : '❤'}
+              {item.done? '✨' : '⚾'}
               </CheckIcon>
           </Check>
           <TodoItemText> 
